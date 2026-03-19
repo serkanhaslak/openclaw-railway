@@ -219,6 +219,9 @@ RUN ln -sf /app/openclaw.mjs /usr/local/bin/openclaw \
 
 ENV NODE_ENV=production
 
+# Ensure Railway volume mount path is writable by the non-root user.
+RUN mkdir -p /data/.openclaw /data/workspace && chown -R node:node /data
+
 # Security hardening: Run as non-root user
 # The node:24-bookworm image includes a 'node' user (uid 1000)
 # This reduces the attack surface by preventing container escape via root privileges
