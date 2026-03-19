@@ -219,13 +219,12 @@ RUN ln -sf /app/openclaw.mjs /usr/local/bin/openclaw \
 
 ENV NODE_ENV=production
 
-# Ensure Railway volume mount path is writable by the non-root user.
-RUN mkdir -p /data/.openclaw /data/workspace && chown -R node:node /data
-
 # Security hardening: Run as non-root user
 # The node:24-bookworm image includes a 'node' user (uid 1000)
 # This reduces the attack surface by preventing container escape via root privileges
-USER node
+# NOTE: We do NOT switch to USER node here because Railway mounts /data
+# as root at runtime. The entrypoint script handles permissions + user switch.
+USER root
 
 # Start gateway server with default config.
 # Binds to loopback (127.0.0.1) by default for security.
@@ -243,4 +242,8 @@ USER node
 COPY config/railway.openclaw.json /app/config/railway.openclaw.json
 ENV OPENCLAW_CONFIG_PATH="/app/config/railway.openclaw.json"
 
-CMD ["node", "openclaw.mjs", "gateway", "--bind", "lan", "--port", "8080", "--allow-unconfigured"]
+# Entrypoint fixes /data volume permissions then drops to node user
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
