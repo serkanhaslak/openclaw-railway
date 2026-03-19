@@ -239,4 +239,8 @@ USER node
 #   - GET /healthz (liveness) and GET /readyz (readiness)
 #   - aliases: /health and /ready
 # For external access from host/ingress, override bind to "lan" and set auth.
+# Railway-specific config (allows Control UI on non-loopback bind)
+COPY config/railway.openclaw.json /app/config/railway.openclaw.json
+ENV OPENCLAW_CONFIG_PATH="/app/config/railway.openclaw.json"
+
 CMD ["node", "openclaw.mjs", "gateway", "--bind", "lan", "--port", "8080", "--allow-unconfigured"]
