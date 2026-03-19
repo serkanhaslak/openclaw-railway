@@ -2,6 +2,5 @@
 builder = "DOCKERFILE"
 
 [deploy]
-startCommand = "node openclaw.mjs gateway --bind lan --port $PORT --allow-unconfigured"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
